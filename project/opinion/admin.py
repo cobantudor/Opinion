@@ -31,6 +31,7 @@ class SubscribeAdmin(admin.ModelAdmin):
 	date_hierarchy = 'timestamp'
 	empty_value_display = '-empty-'
 	list_display = ('user','timestamp','subscribe')
+	search_fields = ['user__name','subscribe__name']
 admin.site.register(Subscribe,SubscribeAdmin)
 
 
@@ -38,7 +39,7 @@ class OpinionAdmin(admin.ModelAdmin):
 	mpty_value_display = '-empty-'
 	readonly_fields = ('upvote','downvote')
 	list_display = ('id_article','opinion','id_author','upvote','downvote')
-	search_fields = ['opinion']
+	search_fields = ['id_article__title','opinion','id_author__name']
 
 admin.site.register(Opinion,OpinionAdmin)
 
@@ -54,6 +55,7 @@ class Tag_ArticleAdmin(admin.ModelAdmin):
 	empty_value_display = '-empty-'
 	list_display = ('article_id','tag_id')
 	list_filter = ('tag_id',)
+	search_fields = ['article_id__title']
 admin.site.register(Tag_article,Tag_ArticleAdmin)
 
 
@@ -69,5 +71,5 @@ class ElementAdmin(admin.ModelAdmin):
 	empty_value_display = '-empty-'
 	list_display = ('element','lang','content')
 	search_fields = ['element','content']
-	list_filter = ('lang','element',)
+	list_filter = ('lang',)
 admin.site.register(Element,ElementAdmin)

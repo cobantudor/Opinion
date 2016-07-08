@@ -1,12 +1,26 @@
 from django.db import models
 
+from django.utils.text import slugify
 # Create your models here.
+
+class Language(models.Model):
+	lang = models.CharField(max_length=20)
+
+	def __str__(self):
+		return self.lang
+
 class Article(models.Model):
-	title = models.CharField(max_length=200)
+	title = models.CharField(max_length=200,unique=True)
 	country = models.CharField(max_length=50)
 	timestamp = models.DateTimeField(auto_now=False,auto_now_add=True)
-	article_lang = models.CharField(max_length=50)
-	opinions = models.IntegerField()
+	article_lang  = models.ForeignKey(Language, on_delete=models.CASCADE)
+	opinions = models.IntegerField(null=True,default=0)
+	slug = models.CharField(max_length=200,unique=True,null=True)
+
+	def save(self, *args, **kwargs):
+		if not self.id:
+			self.slug = slugify(self.title)
+		super(Article, self).save(*args, **kwargs)
 
 	def __str__(self):
 		return self.title
@@ -16,6 +30,7 @@ class User(models.Model):
 	password = models.CharField(max_length=50)
 	email = models.EmailField(max_length=100)
 	name = models.CharField(max_length=100)
+	lang = models.ForeignKey(Language, on_delete=models.CASCADE)
 
 	def __str__(self):
 		return self.name
@@ -39,8 +54,8 @@ class Opinion(models.Model):
 	id_article = models.ForeignKey(Article, on_delete=models.CASCADE)
 	opinion = models.TextField()
 	id_author = models.ForeignKey(Author, on_delete=models.CASCADE)
-	upvote = models.IntegerField()
-	downvote = models.IntegerField()
+	upvote = models.IntegerField(null=True,default=0)
+	downvote = models.IntegerField(null=True,default=0)
 
 
 class Tag(models.Model):
@@ -64,8 +79,9 @@ class Setting(models.Model):
 
 class Element(models.Model):
 	element = models.CharField(max_length=200)
-	lang = models.CharField(max_length=50)
+	lang = models.ForeignKey(Language, on_delete=models.CASCADE)
 	content = models.CharField(max_length=200)
 
 	def __str__(self):
 		return self.element
+

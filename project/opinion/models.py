@@ -1,6 +1,7 @@
 from django.db import models
 
 from django.utils.text import slugify
+from django.core.urlresolvers import reverse
 # Create your models here.
 
 class Language(models.Model):
@@ -25,6 +26,10 @@ class Article(models.Model):
 	def __str__(self):
 		return self.title
 
+	def get_absolute_url(self):
+		return reverse("news_page", kwargs={"slug": self.slug})
+		#return "/news/%s/" %(self.slug)
+
 class User(models.Model):
 	loghin = models.CharField(max_length=50)
 	password = models.CharField(max_length=50)
@@ -34,6 +39,10 @@ class User(models.Model):
 
 	def __str__(self):
 		return self.name
+
+	def get_absolute_url(self):
+		return "/user/%s/" %(self.id)
+		#return reverse("user_page", kwargs={"id": self.id})
 
 class Author(models.Model):
 	user = models.ForeignKey(User, on_delete=models.CASCADE)

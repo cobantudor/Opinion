@@ -1,22 +1,12 @@
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404
-from .models import *
 
+from .models import *
+from .forms import *
 # Create your views here.
 # p/u setari
 #from django.conf import settings
-from django.template.defaultfilters import slugify
 
-
-def welcome(request):
-	#return HttpResponse("<h1>WELCOME</h1>")
-	queryset = Article.objects.all()
-
-	context = {
-		"article_list" : queryset,
-		"title" : "Welcome to UTM"
-	}
-	return render(request,"welcome.html", context)
 
 
 '''
@@ -52,3 +42,47 @@ def news(request,slug):
 
 def home(request):
 	return HttpResponse("<h1>Home page</h1>")
+
+
+def welcome(request):
+	queryset = Article.objects.all()
+
+	context = {
+		"article_list" : queryset,
+		"title" : "Welcome to UTM",
+	}
+	return render(request,"welcome.html", context)
+
+def user(request,id):
+	instance = get_object_or_404(User,id=id)
+	context = {
+		"instance" : instance,
+	}
+	return render(request,"user.html",context)
+
+def register(request):
+	form = RegisterForm(request.POST or None)
+	if form.is_valid():
+		instance = form.save(commit=False)
+		instance.save()
+		return HttpResponseRedirect(instance.get_absolute_url())
+	context = {
+		"title" : "Welcome to UTM",
+		"form" : form
+	}
+	return render(request,"register.html", context)
+
+def user_edit(request,id):
+	instance = get_object_or_404(User,id=id)
+
+	form = UserChangeForm(request.POST or None, instance=instance)
+	if form.is_valid():
+		instance = form.save(commit=False)
+		instance.save()
+		return HttpResponseRedirect(instance.get_absolute_url())
+	context = {
+		"article_list" : instance.name,
+		"instance" : instance,
+		"form" : form, 
+	}
+	return render(request,"user_edit.html",context)

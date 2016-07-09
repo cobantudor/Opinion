@@ -1,5 +1,6 @@
 from django.http import HttpResponse, HttpResponseRedirect
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
+from django.contrib import messages
 
 from .models import *
 from .forms import *
@@ -32,6 +33,19 @@ def news(request,article_title):
 '''
 
 
+def welcome(request):
+	return render(request,"welcome.html")
+
+
+def home(request):
+	queryset = Article.objects.all()
+
+	context = {
+		"article_list" : queryset,
+		"title" : "Welcome to UTM",
+	}
+	return render(request,"home.html", context)
+
 def news(request,slug):
 	instance = get_object_or_404(Article,slug=slug)
 	context = {
@@ -40,18 +54,6 @@ def news(request,slug):
 	}
 	return render(request,"news.html",context)
 
-def home(request):
-	return HttpResponse("<h1>Home page</h1>")
-
-
-def welcome(request):
-	queryset = Article.objects.all()
-
-	context = {
-		"article_list" : queryset,
-		"title" : "Welcome to UTM",
-	}
-	return render(request,"welcome.html", context)
 
 def user(request,id):
 	instance = get_object_or_404(User,id=id)
@@ -79,6 +81,7 @@ def user_edit(request,id):
 	if form.is_valid():
 		instance = form.save(commit=False)
 		instance.save()
+		messages.success(request,"Successfuly edited")
 		return HttpResponseRedirect(instance.get_absolute_url())
 	context = {
 		"article_list" : instance.name,

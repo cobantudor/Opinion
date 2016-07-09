@@ -67,7 +67,7 @@ particlesJS("particles-js", {
     },
     "move": {
       "enable": true,
-      "speed": 6,
+      "speed": 9,
       "direction": "none",
       "random": false,
       "straight": false,
@@ -88,7 +88,7 @@ particlesJS("particles-js", {
         "mode": "grab"
       },
       "onclick": {
-        "enable": true,
+        "enable": false,
         "mode": "push"
       },
       "resize": true

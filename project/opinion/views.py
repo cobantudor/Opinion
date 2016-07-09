@@ -1,4 +1,5 @@
 from django.http import HttpResponse, HttpResponseRedirect
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
 
@@ -36,15 +37,38 @@ def news(request,article_title):
 def welcome(request):
 	return render(request,"welcome.html")
 
-
 def home(request):
 	queryset = Article.objects.all()
-
 	context = {
 		"article_list" : queryset,
 		"title" : "Welcome to UTM",
 	}
 	return render(request,"home.html", context)
+
+
+
+def pages(request):
+	queryset_list = Article.objects.all().order_by("-timestamp")
+	paginator = Paginator(queryset_list, 2) 
+	
+	page = request.GET.get('page')
+	try:
+		queryset = paginator.page(page)
+	except PageNotAnInteger:
+		# If page is not an integer, deliver first page.
+		queryset = paginator.page(1)
+	except EmptyPage:
+	# If page is out of range (e.g. 9999), deliver last page of results.
+		queryset = paginator.page(paginator.num_pages)
+
+	context = {
+		"article_list" : queryset,
+		"title" : "Welcome to UTM",
+	}
+	return render(request,"pages.html", context)
+
+
+
 
 def news(request,slug):
 	instance = get_object_or_404(Article,slug=slug)

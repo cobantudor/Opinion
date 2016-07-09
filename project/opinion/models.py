@@ -43,6 +43,8 @@ class User(models.Model):
 	def get_absolute_url(self):
 		return "/user/%s/" %(self.id)
 		#return reverse("user_page", kwargs={"id": self.id})
+	
+
 
 class Author(models.Model):
 	user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -66,6 +68,8 @@ class Opinion(models.Model):
 	upvote = models.IntegerField(null=True,default=0)
 	downvote = models.IntegerField(null=True,default=0)
 
+	class Meta:
+		ordering = ["-upvote","downvote"]
 
 class Tag(models.Model):
 	tag_name =  models.CharField(max_length=50)

@@ -1,50 +1,31 @@
 from django.http import HttpResponse, HttpResponseRedirect
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from django.shortcuts import render, get_object_or_404, redirect
+from django.shortcuts import render, get_object_or_404, get_list_or_404, redirect
 from django.contrib import messages
 
 from .models import *
 from .forms import *
-# Create your views here.
-# p/u setari
 #from django.conf import settings
 
-
-
-'''
-Other ways to map URL
-
-by id
-def news(request,id):
-	instance = get_object_or_404(Article,id=id)
-	context = {
-		"article_list" : instance.title,
-		"instance" : instance,
-	}
-	return render(request,"news.html",context)
-
-by name
-def news(request,article_title):
-	instance = get_object_or_404(Article,title=article_title)
-	context = {
-		"article_list" : instance.title,
-		"instance" : instance,
-	}
-	return render(request,"news.html",context)
-'''
 
 
 def welcome(request):
 	return render(request,"welcome.html")
 
-def home(request):
-	queryset = Article.objects.all()
-	context = {
-		"article_list" : queryset,
-		"title" : "Welcome to UTM",
-	}
-	return render(request,"home.html", context)
+def about(request):
+	return render(request,"about.html")
 
+def home(request):
+	if 'user' not in request.session:
+		request.session['user'] = "yes"
+		return HttpResponseRedirect("/welcome")
+	else:
+		queryset = Article.objects.all()
+		context = {
+			"article_list" : queryset,
+			"title" : "Welcome to UTM",
+		}
+		return render(request,"home.html", context)
 
 
 def pages(request):
@@ -55,10 +36,8 @@ def pages(request):
 	try:
 		queryset = paginator.page(page)
 	except PageNotAnInteger:
-		# If page is not an integer, deliver first page.
 		queryset = paginator.page(1)
 	except EmptyPage:
-	# If page is out of range (e.g. 9999), deliver last page of results.
 		queryset = paginator.page(paginator.num_pages)
 
 	context = {
@@ -68,9 +47,8 @@ def pages(request):
 	return render(request,"pages.html", context)
 
 
-
-
 def news(request,slug):
+
 	instance = get_object_or_404(Article,slug=slug)
 	context = {
 		"article_list" : instance.title,
@@ -86,7 +64,9 @@ def user(request,id):
 	}
 	return render(request,"user.html",context)
 
+
 def register(request):
+	# request.Files or None numai cind sunt fisiere
 	form = RegisterForm(request.POST or None)
 	if form.is_valid():
 		instance = form.save(commit=False)
@@ -98,10 +78,11 @@ def register(request):
 	}
 	return render(request,"register.html", context)
 
+
 def user_edit(request,id):
 	instance = get_object_or_404(User,id=id)
 
-	form = UserChangeForm(request.POST or None, instance=instance)
+	form = UserChangeForm(request.POST or None, instance=instance ,)
 	if form.is_valid():
 		instance = form.save(commit=False)
 		instance.save()

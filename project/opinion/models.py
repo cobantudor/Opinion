@@ -12,6 +12,7 @@ class Language(models.Model):
 
 class Article(models.Model):
 	title = models.CharField(max_length=200,unique=True)
+	image = models.FileField(null=True,blank=True)
 	country = models.CharField(max_length=50)
 	timestamp = models.DateTimeField(auto_now=False,auto_now_add=True)
 	article_lang  = models.ForeignKey(Language, on_delete=models.CASCADE)

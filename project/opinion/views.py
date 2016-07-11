@@ -12,38 +12,55 @@ from .forms import *
 
 
 def welcome(request):
+	request.session['guest'] = "yes"
 	return render(request,"welcome.html")
 
 def login(request):
-	form = LoginForm(request.POST or None)
+	if 'user' not in request.session:
+		form = LoginForm(request.POST or None)
 
-	email = request.POST.get('email','')
-	password = request.POST.get('password','')
-	exist = User.objects.filter(email=email, password=password).exists()
-	check = 0
-	context = {
-	"form" : form,
-	"exist" : exist,
-	"check" : check
-	}
-	
-	if exist:
-		ID = User.objects.filter(email=email, password=password).values('id')
-		n_id = ID[0]	
-	
-		request.session['user'] = "yes"
-		str1 = "/user/"
-		str2 = str(n_id['id'])
-		str3 = str1 + str2
-		return HttpResponseRedirect(str3)
+		email = request.POST.get('email','')
+		password = request.POST.get('password','')
+		exist = User.objects.filter(email=email, password=password).exists()
+		
+		if(email != ''):
+			check = 1
+		else:
+			check = 0
+		
+		print(check)
+
+		if exist:
+			ID = User.objects.filter(email=email, password=password).values('id')
+			n_id = ID[0]	
+		
+			request.session['user'] = "yes"
+			str1 = "/user/"
+			str2 = str(n_id['id'])
+			str3 = str1 + str2
+			request.session['userid'] = str(n_id['id'])
+			return HttpResponseRedirect(str3)
+			
+		else:
+			context = {
+			"form" : form,
+			"check" : check
+			}
+			return render(request,"login.html",context)
+
 	else:
-		return render(request,"login.html",context)
-	
+		return HttpResponseRedirect("/home")
 
+
+def logout(request):
+	if 'user' in request.session:
+		del request.session['user']
+		del request.session['userid']
+	return  HttpResponseRedirect("/login")
 
 
 def home(request):
-	if 'user' not in request.session:
+	if 'guest' not in request.session:
 		
 		return HttpResponseRedirect("/welcome")
 	else:

@@ -1,10 +1,12 @@
 from django.http import HttpResponse, HttpResponseRedirect
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from django.shortcuts import render, get_object_or_404, get_list_or_404, redirect
-from django.contrib import messages
+from django.shortcuts import render, get_object_or_404, get_list_or_404, redirect, render_to_response
+from django.contrib import messages, auth
+from django.core.context_processors import csrf
 
 from .models import *
 from .forms import *
+
 #from django.conf import settings
 
 
@@ -12,12 +14,37 @@ from .forms import *
 def welcome(request):
 	return render(request,"welcome.html")
 
-def about(request):
-	return render(request,"about.html")
+def login(request):
+	form = LoginForm(request.POST or None)
+
+	email = request.POST.get('email','')
+	password = request.POST.get('password','')
+	exist = User.objects.filter(email=email, password=password).exists()
+	check = 0
+	context = {
+	"form" : form,
+	"exist" : exist,
+	"check" : check
+	}
+	
+	if exist:
+		ID = User.objects.filter(email=email, password=password).values('id')
+		n_id = ID[0]	
+	
+		request.session['user'] = "yes"
+		str1 = "/user/"
+		str2 = str(n_id['id'])
+		str3 = str1 + str2
+		return HttpResponseRedirect(str3)
+	else:
+		return render(request,"login.html",context)
+	
+
+
 
 def home(request):
 	if 'user' not in request.session:
-		request.session['user'] = "yes"
+		
 		return HttpResponseRedirect("/welcome")
 	else:
 		queryset = Article.objects.all()

@@ -12,8 +12,11 @@ from .forms import *
 
 
 def welcome(request):
-	request.session['guest'] = "yes"
-	return render(request,"welcome.html")
+	if 'user' not  in request.session:
+		request.session['guest'] = "yes"
+		return render(request,"welcome.html")
+	else:
+		return HttpResponseRedirect("/home")
 
 def login(request):
 	if 'user' not in request.session:
@@ -60,19 +63,6 @@ def logout(request):
 
 
 def home(request):
-	if 'guest' not in request.session:
-		
-		return HttpResponseRedirect("/welcome")
-	else:
-		queryset = Article.objects.all()
-		context = {
-			"article_list" : queryset,
-			"title" : "Welcome to UTM",
-		}
-		return render(request,"home.html", context)
-
-
-def pages(request):
 	queryset_list = Article.objects.all().order_by("-timestamp")
 	paginator = Paginator(queryset_list, 2) 
 	

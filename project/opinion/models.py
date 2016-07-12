@@ -49,9 +49,10 @@ class User(models.Model):
 class Author(models.Model):
 	user = models.ForeignKey(User, on_delete=models.CASCADE)
 	name = models.CharField(max_length=100)
-	about = models.CharField(max_length=200)
+	about = models.TextField()
 	email = models.EmailField(max_length=100)
 	slug = models.CharField(max_length=200,unique=True,null=True)
+	image = models.FileField(null=True,blank=True)
 
 	def save(self, *args, **kwargs):
 		if not self.id:

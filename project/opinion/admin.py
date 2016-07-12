@@ -26,7 +26,7 @@ admin.site.register(User,UserAdmin)
 
 class AuthorAdmin(admin.ModelAdmin):
 	empty_value_display = '-empty-'
-	list_display = ('user','name','email','about','slug')
+	list_display = ('user','name','email','about','slug','image')
 	search_fields = ['name','email']
 admin.site.register(Author,AuthorAdmin)
 

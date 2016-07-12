@@ -31,7 +31,6 @@ def login(request):
 		else:
 			check = 0
 		
-		print(check)
 
 		if exist:
 			ID = User.objects.filter(email=email, password=password).values('id')
@@ -94,18 +93,22 @@ def news(request,slug):
 	obj_id = instance
 	opinions = Opinion.objects.all().filter(id_article=obj_id.id).order_by("-upvote","downvote")
 	tops = Article.objects.all().order_by("-opinions")[:5]
-	tags = Tag_article.objects.all()
+	tags = Tag.objects.all()
+	
 	authors = Opinion.objects.all().order_by("-upvote")[:1]
 	obj = authors[0]
 	author = get_object_or_404(Author,slug=obj.id_author)
 
+
+	last = Opinion.objects.all().order_by("-upvote")[:1]
 
 	context = {
 		"instance" : instance,
 		"opinions" : opinions,
 		"tops" : tops,
 		"tags" : tags,
-		"author" : author
+		"author" : author,
+		"last" : last,
 	}
 	return render(request,"news.html",context)
 
@@ -114,6 +117,7 @@ def country(request,country):
 	obj_list = get_list_or_404(Article,country=country)
 	context = {
 		"list" : obj_list,
+		"country": country,
 	}
 	return render(request,"country.html",context)
 
@@ -134,6 +138,7 @@ def tag(request,tag):
 	
 	context = {
 		"list" : obj_list,
+		"tag" : tag,
 	}
 	return render(request,"tag.html",context)
 
@@ -144,19 +149,17 @@ def lang(request,lang):
 	
 	context = {
 		"list" : obj_list,
+		"lang" : lang,
 	}
 	return render(request,"lang.html",context)
 
 
-def search(request,word):
+def search(request):
+	
+	form = LoginForm(request.POST or None)
+	word = request.POST.get('word','')
 	
 	
-	#articles = Article.objects.all().filter(title__contains=word)
-	#number2 = Article.objects.all().filter(title__contains=word).count
-	#.order_by("-opinions").distinct()
-
-	
-
 	articles = Article.objects.all().filter(title__contains=word)
 	number1 = Article.objects.all().filter(title__contains=word).count
 
@@ -166,13 +169,14 @@ def search(request,word):
 	authors = Author.objects.all().filter(name__contains=word)
 	number3 = Author.objects.all().filter(name__contains=word).count()
 
+	
 	context = {
 		"list1" : articles,
 		"number1" : number1,
 		"list2" : opinions,
 		"number2" : number2,
 		"list3" : authors,
-		"number3" : number2,
+		"number3" : number3,
 	}
 	return render(request,"search.html",context)
 

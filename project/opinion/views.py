@@ -64,7 +64,9 @@ def logout(request):
 
 def home(request):
 	queryset_list = Article.objects.all().order_by("-timestamp")
-	paginator = Paginator(queryset_list, 2) 
+	top3 = Opinion.objects.all().order_by("-upvote")[:3]
+
+	paginator = Paginator(queryset_list, 4) 
 	
 	page = request.GET.get('page')
 	try:
@@ -76,6 +78,7 @@ def home(request):
 
 	context = {
 		"article_list" : queryset,
+		"tops" : top3,
 		"title" : "Welcome to UTM",
 	}
 	return render(request,"pages.html", context)
@@ -84,19 +87,64 @@ def home(request):
 def news(request,slug):
 
 	instance = get_object_or_404(Article,slug=slug)
+	obj_id = instance
+	opinions = Opinion.objects.all().filter(id_article=obj_id.id).order_by("-upvote","downvote")
+	tops = Article.objects.all().order_by("-opinions")[:5]
+	tags = Tag_article.objects.all()
+	authors = Opinion.objects.all().order_by("-upvote")[:1]
+	obj = authors[0]
+	author = get_object_or_404(Author,slug=obj.id_author)
+
+
 	context = {
-		"article_list" : instance.title,
 		"instance" : instance,
+		"opinions" : opinions,
+		"tops" : tops,
+		"tags" : tags,
+		"author" : author
 	}
 	return render(request,"news.html",context)
 
+def country(request,country):
+
+	obj_list = get_list_or_404(Article,country=country)
+	context = {
+		"list" : obj_list,
+	}
+	return render(request,"country.html",context)
+
+def author(request,slug):
+	obj_list = get_object_or_404(Author,slug=slug)
+	id_auth = obj_list.id
+	opinions = get_list_or_404(Opinion,id_author=id_auth)
+	context = {
+		"auth" : obj_list,
+		"opinions" : opinions,
+	}
+	return render(request,"author.html",context)
+
+def tag(request,tag):
+	
+	obj = get_object_or_404(Tag,tag_name=tag)
+	obj_list = get_list_or_404(Tag_article,tag_id=obj.id)
+	
+	context = {
+		"list" : obj_list,
+	}
+	return render(request,"tag.html",context)
+
+
+def search(request,query):
+	return render(request,"search.html",context)
+
 
 def user(request,id):
-	instance = get_object_or_404(User,id=id)
+	query = get_object_or_404(User,id=id)
 	context = {
-		"instance" : instance,
+		"query" : query,
 	}
 	return render(request,"user.html",context)
+
 
 
 def register(request):

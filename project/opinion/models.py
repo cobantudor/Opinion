@@ -25,11 +25,11 @@ class Article(models.Model):
 		super(Article, self).save(*args, **kwargs)
 
 	def __str__(self):
-		return self.title
+		return self.slug
 
 	def get_absolute_url(self):
 		return reverse("news_page", kwargs={"slug": self.slug})
-		#return "/news/%s/" %(self.slug)
+	
 
 class User(models.Model):
 	loghin = models.CharField(max_length=50)
@@ -43,7 +43,6 @@ class User(models.Model):
 
 	def get_absolute_url(self):
 		return "/user/%s/" %(self.id)
-		#return reverse("user_page", kwargs={"id": self.id})
 	
 
 
@@ -52,9 +51,18 @@ class Author(models.Model):
 	name = models.CharField(max_length=100)
 	about = models.CharField(max_length=200)
 	email = models.EmailField(max_length=100)
+	slug = models.CharField(max_length=200,unique=True,null=True)
+
+	def save(self, *args, **kwargs):
+		if not self.id:
+			self.slug = slugify(self.name)
+		super(Author, self).save(*args, **kwargs)
+
+	def get_absolute_url(self):
+		return "/author/%s/" %(self.slug)
 
 	def __str__(self):
-		return  self.name
+		return  self.slug
 		
 class Subscribe(models.Model):
 	timestamp = models.DateTimeField(auto_now=False,auto_now_add=True)
@@ -68,6 +76,9 @@ class Opinion(models.Model):
 	id_author = models.ForeignKey(Author, on_delete=models.CASCADE)
 	upvote = models.IntegerField(null=True,default=0)
 	downvote = models.IntegerField(null=True,default=0)
+
+	def get_absolute_url(self):
+		return "/opinion/%s/" %(self.id)
 
 	class Meta:
 		ordering = ["-upvote","downvote"]

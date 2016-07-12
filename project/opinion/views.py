@@ -76,12 +76,16 @@ def home(request):
 	except EmptyPage:
 		queryset = paginator.page(paginator.num_pages)
 
+	mytags =	get_list_or_404(Tag_article)
+
 	context = {
 		"article_list" : queryset,
 		"tops" : top3,
 		"title" : "Welcome to UTM",
+		"mytags" : mytags,
 	}
 	return render(request,"pages.html", context)
+
 
 
 def news(request,slug):
@@ -133,8 +137,43 @@ def tag(request,tag):
 	}
 	return render(request,"tag.html",context)
 
+def lang(request,lang):
+	
+	obj = get_object_or_404(Language,lang=lang)
+	obj_list = get_list_or_404(Article,article_lang=obj.id)
+	
+	context = {
+		"list" : obj_list,
+	}
+	return render(request,"lang.html",context)
 
-def search(request,query):
+
+def search(request,word):
+	
+	
+	#articles = Article.objects.all().filter(title__contains=word)
+	#number2 = Article.objects.all().filter(title__contains=word).count
+	#.order_by("-opinions").distinct()
+
+	
+
+	articles = Article.objects.all().filter(title__contains=word)
+	number1 = Article.objects.all().filter(title__contains=word).count
+
+	opinions = Opinion.objects.all().filter(opinion__contains=word)
+	number2 = Opinion.objects.all().filter(opinion__contains=word).count()
+
+	authors = Author.objects.all().filter(name__contains=word)
+	number3 = Author.objects.all().filter(name__contains=word).count()
+
+	context = {
+		"list1" : articles,
+		"number1" : number1,
+		"list2" : opinions,
+		"number2" : number2,
+		"list3" : authors,
+		"number3" : number2,
+	}
 	return render(request,"search.html",context)
 
 

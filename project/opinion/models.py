@@ -94,6 +94,9 @@ class Tag_article(models.Model):
 	article_id = models.ForeignKey(Article, on_delete=models.CASCADE)
 	tag_id = models.ForeignKey(Tag, on_delete=models.CASCADE)
 
+	def __str__(self):
+		return self.article_id.slug
+
 
 class Setting(models.Model):
 	obj = models.CharField(max_length=100)

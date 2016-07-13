@@ -77,13 +77,27 @@ def home(request):
 
 	mytags =	get_list_or_404(Tag_article)
 
+	#sidebar 
+	tops = Article.objects.all().order_by("-opinions")[:5]
+	tags = Tag.objects.all()
+	authors = Opinion.objects.all().order_by("-upvote")[:1]
+	obj = authors[0]
+	author = get_object_or_404(Author,slug=obj.id_author)
+	last = Opinion.objects.all().order_by("-upvote")[:1]
+
+
 	context = {
 		"article_list" : queryset,
-		"tops" : top3,
+		"top3" : top3,
 		"title" : "Welcome to UTM",
 		"mytags" : mytags,
+		"tops" : tops,
+		"tags" : tags,
+		"author" : author,
+		"last" : last,
 	}
 	return render(request,"pages.html", context)
+
 
 
 
@@ -94,12 +108,9 @@ def news(request,slug):
 	opinions = Opinion.objects.all().filter(id_article=obj_id.id).order_by("-upvote","downvote")
 	tops = Article.objects.all().order_by("-opinions")[:5]
 	tags = Tag.objects.all()
-	
 	authors = Opinion.objects.all().order_by("-upvote")[:1]
 	obj = authors[0]
 	author = get_object_or_404(Author,slug=obj.id_author)
-
-
 	last = Opinion.objects.all().order_by("-upvote")[:1]
 
 	context = {

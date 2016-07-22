@@ -12,11 +12,20 @@ from .forms import *
 
 
 def welcome(request):
-	if 'user' not  in request.session:
-		request.session['guest'] = "yes"
-		return render(request,"welcome.html")
-	else:
-		return HttpResponseRedirect("/home")
+	#if 'user' not  in request.session:
+	#	request.session['guest'] = "yes"
+	#	return render(request,"welcome.html")
+	#else:
+	#	return HttpResponseRedirect("/home")
+	return render(request,"welcome.html")
+	
+def notfound(request):
+	#if 'user' not  in request.session:
+	#	request.session['guest'] = "yes"
+	#	return render(request,"welcome.html")
+	#else:
+	#	return HttpResponseRedirect("/home")
+	return render(request,"404.html")
 
 def login(request):
 	if 'user' not in request.session:
@@ -41,8 +50,9 @@ def login(request):
 			str2 = str(n_id['id'])
 			str3 = str1 + str2
 			request.session['userid'] = str(n_id['id'])
-			return HttpResponseRedirect(str3)
-			
+			#return HttpResponseRedirect(str3)
+			return HttpResponseRedirect("/home")
+
 		else:
 			context = {
 			"form" : form,
@@ -62,6 +72,11 @@ def logout(request):
 
 
 def home(request):
+	#if 'user' not  in request.session:
+	#	request.session['guest'] = "yes"
+	#	return render(request,"welcome.html")
+	
+
 	queryset_list = Article.objects.all().order_by("-timestamp")
 	top3 = Opinion.objects.all().order_by("-upvote")[:3]
 
@@ -113,6 +128,7 @@ def news(request,slug):
 	author = get_object_or_404(Author,slug=obj.id_author)
 	last = Opinion.objects.all().order_by("-upvote")[:1]
 
+	
 	context = {
 		"instance" : instance,
 		"opinions" : opinions,

@@ -78,6 +78,7 @@ class Opinion(models.Model):
 	upvote = models.IntegerField(null=True,default=0)
 	downvote = models.IntegerField(null=True,default=0)
 
+
 	def get_absolute_url(self):
 		return "/opinion/%s/" %(self.id)
 
